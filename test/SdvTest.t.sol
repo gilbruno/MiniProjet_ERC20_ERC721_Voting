@@ -5,11 +5,15 @@ pragma solidity 0.8.24;
 import {Test, console} from "forge-std/Test.sol";
 import {console} from "forge-std/Script.sol";
 import {UsdvToken} from "../src/UsdvToken.sol";
+import {SdvNft} from "../src/SdvNft.sol";
+import {DeploySdvNft} from "../script/DeploySdvNft.s.sol";
+
 
 contract SdvTest is Test {
 
     address USER = makeAddr('USER');
     address USER2 = makeAddr('USER2');
+    address ADMIN_COLLECTION_NFT = makeAddr('admin_NFT');
     address USDV_DEPLOYER = makeAddr('usdv_deployer');
     string USDV_NAME = 'USDV';
     string USDV_SYMBOL = 'USDV';
@@ -18,14 +22,24 @@ contract SdvTest is Test {
 
     uint STARTING_ETH_BALANCE = 10 ether;
 
+    string NFT_NAME = 'Sup De Vinci Nft';
+    string NFT_SYMBOL = 'SdvNft';
+
+    string TOKEN_URI = 'https://ipfs.io/ipfs/Qnehyywgwdglh36FGHxfgh788';
+
+    SdvNft sdvNft;
+
+
+
     function setUp() public {
         vm.deal(USDV_DEPLOYER, STARTING_ETH_BALANCE);
+        // NFT
+        DeploySdvNft deploySdvNft = new DeploySdvNft();
+        sdvNft = deploySdvNft.run();
 
     }
 
     function testDeployerOwnAllTheSupplyAfterDeplyment() public {
-        uint balanceOwnerBefore = USDV_DEPLOYER.balance;
-
         UsdvToken usdvToken;
         vm.startPrank(USDV_DEPLOYER);
         usdvToken = new UsdvToken(USDV_NAME, USDV_SYMBOL, INIT_SUPPLY);
@@ -70,5 +84,44 @@ contract SdvTest is Test {
         usdvToken.mint(USER2, 100);
         vm.stopPrank();
     }
+
+    /*** TEST NFTs */
+
+    function testNftName() public view {
+        string memory expectedName = NFT_NAME;
+        string memory actualName = sdvNft.name();
+        assertEq(expectedName, actualName);
+    }   
+
+    function testNonAdminCannotMintNft() public {
+        SdvNft sdvNft_;
+        vm.startPrank(ADMIN_COLLECTION_NFT);
+        sdvNft_ = new SdvNft();
+        vm.stopPrank();
+
+        vm.startPrank(USER);
+        vm.expectRevert();
+        sdvNft_.mintNft(USER2, TOKEN_URI);
+        vm.stopPrank();
+    }
+
+    function testAdminCanMintNft() public {
+        SdvNft sdvNft_;
+        vm.startPrank(ADMIN_COLLECTION_NFT);
+        sdvNft_ = new SdvNft();
+        sdvNft_.mintNft(USER2, TOKEN_URI);
+        vm.stopPrank();
+    }
+
+    function testUserOwnsNftAfterMint() public {
+        SdvNft sdvNft_;
+        vm.startPrank(ADMIN_COLLECTION_NFT);
+        sdvNft_ = new SdvNft();
+        sdvNft_.mintNft(USER2, TOKEN_URI);
+        vm.stopPrank();
+
+        assertEq(sdvNft_.balanceOf(USER2), 1);
+    }
+
 
 }

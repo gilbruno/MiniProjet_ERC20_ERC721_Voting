@@ -24,5 +24,9 @@ contract SdvNft is ERC721, Ownable {
         _safeMint(to, tokenId);
     }
 
+    function tokenURI(uint tokenId_) public view override returns (string memory) {
+        return tokenIdToUri[tokenId_];
+    }
+
 
 }
