@@ -59,3 +59,12 @@ Address NFT SC deployed : 0xa727E67fFf460be1D40E638481C034F1836140F6
 4. Les voters ne peuvent voter que s'ils sont proprietaires d'un NFT de la collection de NFT précédemment créée
 
 5. Tests unitaires
+
+# Web3 Learning platforms
+
+ - Alchemy University
+ - Chainlink YT Channel
+ - Free Code Camp
+ - Cyfrin Updraft
+ - Patrick Collins YT Channel
+ - Ben BK YT Channel
