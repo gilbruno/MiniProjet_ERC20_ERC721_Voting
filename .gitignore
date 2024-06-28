@@ -12,3 +12,9 @@ docs/
 
 # Dotenv file
 .env
+
+# Local History files
+.history
+
+# blockchain broadcast
+broadcast/*
